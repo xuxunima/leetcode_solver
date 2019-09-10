@@ -26,7 +26,7 @@ candidates 中的数字可以无限制重复被选取。
 ]
 >
 首先画出本题的树状图如下：  
-![组合总数](sdsddg)  
+![combination](https://github.com/xuxunima/leetcode_solver/blob/master/backtrack/image/combination.PNG)  
 从图中可以看到target为0处即为所求的根节点，为了保证最后的结果没有重复，首先可以对原数组进行排序，每次路径只取大于等于改点的值，另一方面，当下一个值大于target时，一定不是正确路径，所以可以直接略去，达到剪枝效果。  
 ### 回溯法
 ```buildoutcfg
@@ -110,8 +110,8 @@ candidates 中的每个数字在每个组合中只能使用一次。
 ]
 
 这题和上一题的区别是上一题中没有重复数字，但是每个数字可以取多次，这一题中candidates中可能有重复数字，但是每个数字只能取一次。  
-首先画出本题的树形图(第二个2用2’表示)，从图中可以看到当当前数字已经大于target时可以进行剪枝，并且处于同一深度的相同数字也可以进行剪枝。
-![组合总数II]()
+首先画出本题的树形图(第二个2用2’表示)，从图中可以看到当当前数字已经大于target时可以进行剪枝，并且处于同一深度的相同数字也可以进行剪枝。  
+![combinationII](https://github.com/xuxunima/leetcode_solver/blob/master/backtrack/image/combinationII.PNG)
 ```buildoutcfg
 class Solution {
     vector<vector<int>>res;
@@ -519,7 +519,7 @@ public:
 ```
 
 ### 迭代法
-![子集迭代]()
+![subset](https://github.com/xuxunima/leetcode_solver/blob/master/backtrack/image/subset.PNG)  
 每次在上一层循环的基础上插入新的数字。  
 ```buildoutcfg
 class Solution {
@@ -543,8 +543,8 @@ public:
 ```
 
 ### 位掩码
-子集问题可以考虑位掩码方法
-![位掩码]()
+子集问题可以考虑位掩码方法  
+![bit](https://github.com/xuxunima/leetcode_solver/blob/master/backtrack/image/bit.PNG)
 ```buildoutcfg
 class Solution {
 public:
