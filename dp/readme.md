@@ -91,12 +91,12 @@ public:
 ```
 把动态规划的路径画出来如下图：  
 
-![LCS路径](https://github.com/xuxunima/dynamic-programming/blob/master/LCS.png)
+![LCS路径](https://github.com/xuxunima/leetcode_solver/blob/master/dp/image/LCS.png)
 
 
 当text1或者text2为空串时，最长公共子序列为0，即第一行和第一列全为0.   
 当计算dp[i][j]时，若text1[i-1] == text2[j-1],则dp[i][j]是其斜对角元素加1(如下图中黄色框)，若不相等，则dp[i][j]是其左边和上边两元素的最大值(如下图中红色部分)。  
-![LCS](https://github.com/xuxunima/dynamic-programming/blob/master/LCS2.PNG)  
+![LCS](https://github.com/xuxunima/leetcode_solver/blob/master/dp/image/LCS2.PNG)  
   
 因此，我们求当前值的时候只需要它的斜对角和上面以及左边三个值，换句话说，求当前列的值时，只需要前一列的信息，所以我们不需要用一个二维数组来存储信息，只需要一个一维数组就够了。  
 还存在的一个问题是，因为使用一维数组，所以dp[3][1]已经把dp[3][0]覆盖了，所以需要一个prev变量来保存。
@@ -129,7 +129,7 @@ public:
 2.若不相等，则比较dp[i-1][j]和dp[i][j-1]值的大小，跳入大的那一个继续进行判断；   
 3.直到i或者j小于等于0为止，倒序输出lcs_str;   
 Note:若dp[i-1][j]和dp[i][j-1]的值一样大，说明最长公共子序列有多个，两边都需要回溯(用递归)。
-![LCS回溯](https://github.com/xuxunima/dynamic-programming/blob/master/LCS3.jpg)
+![LCS回溯](https://github.com/xuxunima/leetcode_solver/blob/master/dp/image/LCS3.jpg)
 ```buildoutcfg
 set<string>setOfLSC;
 void traceBack(int i, int j, string& lcs_str)
@@ -646,6 +646,139 @@ int complete_bag3(vector<int>& weights, vector<int>& values, int capacity)
 	return dp[capacity];
 }
 ```
+
+## 零钱兑换（322）
+>给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1。   
+示例 1:   
+输入: coins = [1, 2, 5], amount = 11   
+输出: 3    
+解释: 11 = 5 + 5 + 1   
+示例 2:   
+输入: coins = [2], amount = 3   
+输出: -1
+>
+设dp[i]表示总金额为i的最少硬币个数，则dp[i] = min(dp[i], dp[i-coin])(coin<=i)  
+```buildoutcfg
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        int max = amount + 1;
+        vector<int>dp(amount+1, max);
+        dp[0] = 0;
+        for (int i=1; i<=amount;i++)
+        {
+            for (int j=0;j<coins.size();j++)
+            {
+                if (coins[j] <= i)
+                    dp[i] = min(dp[i], dp[i-coins[j]]+1);
+            }
+        }
+        return dp[amount] >= amount+1?-1:dp[amount];
+    }
+};
+```
+
+```buildoutcfg
+class Solution {
+    unordered_map<int, int>m;
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        if (amount == 0)
+            return 0;
+        if (m.count(amount)!=0)
+            return m[amount];
+        int min_coins = amount+1;
+        for (int i=0;i<coins.size();i++)
+        {
+            if (coins[i] <= amount)
+            {
+                int res = coinChange(coins, amount-coins[i]);
+                if (res>=0 && res < min_coins)
+                    min_coins = res + 1;
+            } 
+        }
+        m[amount] = min_coins>amount?-1:min_coins;
+        return m[amount];
+    }
+};
+```
+## 零钱兑换II（518）
+>给定不同面额的硬币和一个总金额。写出函数来计算可以凑成总金额的硬币组合数。假设每一种面额的硬币有无限个。    
+示例 1:   
+输入: amount = 5, coins = [1, 2, 5]   
+输出: 4   
+解释:  
+有四种方式可以凑成总金额:  
+5=5  
+5=2+2+1   
+5=2+1+1+1   
+5=1+1+1+1+1
+>
+设dp[i][j]表示用前i个硬币凑成总金额为j的方法数，则  
+dp[i][j] += dp[i-1][j-k*coins[i-1]] (k<=j/coins[i-1])  
+```buildoutcfg
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        vector<vector<int>>dp(coins.size()+1, vector<int>(amount+1));
+        for (int i=0;i<=coins.size();i++)
+            dp[i][0] = 1;
+        for (int i=1;i<=coins.size();i++)
+        {
+            for (int j=1;j<=amount;j++)
+            {
+                dp[i][j] = dp[i-1][j];
+                for (int k=1;k<=j/coins[i-1];k++)
+                    dp[i][j] += dp[i-1][j-k*coins[i-1]];
+            }
+        }
+        return dp[coins.size()][amount];
+    }
+};
+```
+
+```buildoutcfg
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        vector<vector<int>>dp(coins.size()+1, vector<int>(amount+1));
+        for (int i=0;i<=coins.size();i++)
+            dp[i][0] = 1;
+        for (int i=1;i<=coins.size();i++)
+        {
+            for (int j=1;j<=amount;j++)
+            {
+                dp[i][j] = dp[i-1][j];
+                if (j >= coins[i-1])
+                    dp[i][j] += dp[i][j-coins[i-1]];
+            }
+        }
+        return dp[coins.size()][amount];
+    }
+};
+```
+
+压缩成一维
+```buildoutcfg
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        vector<int>dp(amount+1);
+        dp[0] = 1;
+        for (int i=1;i<=coins.size();i++)
+        {
+            for (int j=1;j<=amount;j++)
+            {
+                if (coins[i-1] <= j)
+                    dp[j] += dp[j-coins[i-1]];
+            }
+        }
+        return dp[amount];
+    }
+};
+```
+
+
 ## Reference
 [【动态规划】输出所有的最长公共子序列](https://blog.csdn.net/lisonglisonglisong/article/details/41596309)  
 [最长递增子序列](https://blog.csdn.net/u013074465/article/details/45442067)
